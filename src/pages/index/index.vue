@@ -3,6 +3,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import {
   getHomeBannerAPI,
   getHomeCategoryAPI,
+  getHomeGoodsGuessLikeAPI,
   getHomeHotAPI,
 } from '@/services/home'
 import { ref } from 'vue'
@@ -28,9 +29,9 @@ const getHomeCategoryData = async () => {
 const HotList = ref<HotItem[]>([])
 const getHomeHotData = async () => {
   const res = await getHomeHotAPI()
-
   HotList.value = res.result
 }
+
 //初始化调用API
 onLoad(() => {
   getHomeBannerData()
@@ -42,9 +43,13 @@ onLoad(() => {
 <template>
   <CustomNavbar />
   <!-- 传值给子组件 -->
-  <XtxSwiper :list="bannerList" />
-  <CategoryPanel :list="categoryList" />
-  <HotPanel :list="HotList" />
+  <scroll-view scroll-y class="scroll-view">
+    <XtxSwiper :list="bannerList" />
+    <CategoryPanel :list="categoryList" />
+    <HotPanel :list="HotList" />
+    <XtxGuess />
+  </scroll-view>
+
   <view class="index">index</view>
 </template>
 
@@ -52,5 +57,11 @@ onLoad(() => {
 //
 page {
   background-color: #f7f7f7;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.scroll-view {
+  flex: 1;
 }
 </style>
