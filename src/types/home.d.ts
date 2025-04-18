@@ -1,3 +1,5 @@
+// 数据类型
+
 /**首页-广告区域数据类型 */
 export type BannerItem = {
   // id
@@ -17,4 +19,19 @@ export type CategoryItem = {
   name: string
   // 图片地址
   icon: string
+}
+/**首页-热门推荐数据类型 */
+export type HotItem = {
+  /** 说明 */
+  alt: string
+  /** id */
+  id: string
+  /** 图片集合[ 图片路径 ] */
+  pictures: string[]
+  /** 跳转地址 */
+  target: string
+  /** 标题 */
+  title: string
+  /** 推荐类型 */
+  type: string
 }
