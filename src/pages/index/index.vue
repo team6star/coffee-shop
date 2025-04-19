@@ -11,6 +11,7 @@ import CustomNavbar from './components/CustomNavbar.vue'
 
 import CategoryPanel from './components/CategoryPanel.vue'
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home'
+import type { XtxGuessInstance } from '@/types/component'
 import HotPanel from './components/HotPanel.vue'
 // 指定类型
 const bannerList = ref<BannerItem[]>([])
@@ -31,6 +32,11 @@ const getHomeHotData = async () => {
   const res = await getHomeHotAPI()
   HotList.value = res.result
 }
+// 滚动容器 滚动触底
+const guessRef = ref<XtxGuessInstance>()
+const onScrolltolower = () => {
+  guessRef.value?.getMore()
+}
 
 //初始化调用API
 onLoad(() => {
@@ -43,11 +49,11 @@ onLoad(() => {
 <template>
   <CustomNavbar />
   <!-- 传值给子组件 -->
-  <scroll-view scroll-y class="scroll-view">
+  <scroll-view @scrolltolower="onScrolltolower" scroll-y class="scroll-view">
     <XtxSwiper :list="bannerList" />
     <CategoryPanel :list="categoryList" />
     <HotPanel :list="HotList" />
-    <XtxGuess />
+    <XtxGuess ref="guessRef" />
   </scroll-view>
 
   <view class="index">index</view>
