@@ -5,7 +5,7 @@ import type { GuessItem } from '@/types/home'
 import { ref, onMounted } from 'vue'
 
 //
-// 获取猜你喜欢列表数据
+
 const guessList = ref<GuessItem[]>([])
 // 分页参数
 const pageParams: Required<PageParams> = {
@@ -14,6 +14,7 @@ const pageParams: Required<PageParams> = {
 }
 // 是否已结束
 const finish = ref(false)
+// 获取猜你喜欢列表数据
 const getHomeGoodsGuessLikeData = async () => {
   if (finish.value === true) {
     return uni.showToast({ title: '数据加载完毕', icon: 'none' })
@@ -23,7 +24,7 @@ const getHomeGoodsGuessLikeData = async () => {
 
   // 数组追加
   guessList.value.push(...res.result.items)
-  // 当前页码是否小于总页数
+  // 分页条件 当前页码是否小于总页数
   if (pageParams.page < res.result.pages) {
     // 页码累加
     pageParams.page++
@@ -31,6 +32,12 @@ const getHomeGoodsGuessLikeData = async () => {
     // 标记为已结束
     finish.value = true
   }
+}
+// 重置数据
+const resetData = () => {
+  pageParams.page = 1
+  guessList.value = []
+  finish.value = false
 }
 
 // 组件挂载完毕
@@ -40,6 +47,7 @@ onMounted(() => {
 // 暴露方法
 defineExpose({
   getMore: getHomeGoodsGuessLikeData,
+  resetData,
 })
 </script>
 

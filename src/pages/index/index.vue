@@ -13,6 +13,7 @@ import CategoryPanel from './components/CategoryPanel.vue'
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home'
 import type { XtxGuessInstance } from '@/types/component'
 import HotPanel from './components/HotPanel.vue'
+import PageSkeleton from './components/PageSkeleton.vue'
 // 指定类型
 const bannerList = ref<BannerItem[]>([])
 const categoryList = ref<CategoryItem[]>([])
@@ -35,28 +36,57 @@ const getHomeHotData = async () => {
 // 滚动容器 滚动触底
 const guessRef = ref<XtxGuessInstance>()
 const onScrolltolower = () => {
+  // 父调子
   guessRef.value?.getMore()
 }
-
-//初始化调用API
-onLoad(() => {
-  getHomeBannerData()
-  getHomeCategoryData()
-  getHomeHotData()
+// 下拉刷新状态
+const isTriggered = ref(false)
+// 自定义下拉刷新被触发
+const onRefresherrefresh = async () => {
+  // 开启动画
+  isTriggered.value = true
+  // 重置数据 父调子
+  guessRef.value?.resetData() //加载数据
+  await Promise.all([
+    getHomeBannerData(),
+    getHomeCategoryData(),
+    getHomeHotData(),
+  ])
+  // 关闭动画
+  isTriggered.value = false
+}
+const isLoading = ref(false)
+//初始化调用API 页面加载
+onLoad(async () => {
+  isLoading.value = true
+  await Promise.all([
+    getHomeBannerData(),
+    getHomeCategoryData(),
+    getHomeHotData(),
+  ])
+  isLoading.value = false
 })
 </script>
 
 <template>
   <CustomNavbar />
   <!-- 传值给子组件 -->
-  <scroll-view @scrolltolower="onScrolltolower" scroll-y class="scroll-view">
-    <XtxSwiper :list="bannerList" />
-    <CategoryPanel :list="categoryList" />
-    <HotPanel :list="HotList" />
-    <XtxGuess ref="guessRef" />
+  <scroll-view
+    refresher-enabled
+    @refresherrefresh="onRefresherrefresh"
+    @scrolltolower="onScrolltolower"
+    :refresher-triggered="isTriggered"
+    scroll-y
+    class="scroll-view"
+  >
+    <PageSkeleton v-if="isLoading" />
+    <template v-else>
+      <XtxSwiper :list="bannerList" />
+      <CategoryPanel :list="categoryList" />
+      <HotPanel :list="HotList" />
+      <XtxGuess ref="guessRef" />
+    </template>
   </scroll-view>
-
-  <view class="index">index</view>
 </template>
 
 <style lang="scss">
