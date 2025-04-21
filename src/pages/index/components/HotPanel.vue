@@ -14,9 +14,10 @@ defineProps<{
         <text class="title-text">{{ item.title }}</text>
         <text class="title-desc">{{ item.alt }}</text>
       </view>
+      <!-- 传递参数 -->
       <navigator
         hover-class="none"
-        url="/pages/hot/hot?type=${item.type}"
+        :url="`/pages/hot/hot?type=${item.type}`"
         class="cards"
       >
         <image

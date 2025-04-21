@@ -5,7 +5,7 @@
     "autoscan": true,
     // 以正则方式自定义组件匹配规则
     "custom": {
-      // uni-ui 规则如下配置  
+      // uni-ui 规则如下配置
       "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
       // 以 Xtx 开头的组件，在 components 目录中查找
       "^Xtx(.*)": "@/components/Xtx$1.vue"
@@ -43,6 +43,12 @@
       "path": "pages/login/login",
       "style": {
         "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/hot/hot",
+      "style": {
+        "navigationBarTitleText": "热门推荐",
       }
     }
   ],
