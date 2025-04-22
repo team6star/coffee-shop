@@ -48,9 +48,15 @@
     {
       "path": "pages/hot/hot",
       "style": {
-        "navigationBarTitleText": "热门推荐",
+        "navigationBarTitleText": "热门推荐"
       }
-    }
+    },
+    {
+      "path": "pages/goods/goods",
+      "style": {
+        "navigationBarTitleText": "商品详情"
+      }
+    },
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
