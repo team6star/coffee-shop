@@ -6,6 +6,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import ServicePanel from './components/ServicePanel.vue'
 import AddressPanel from './components/AddressPanel.vue'
+import PageSkeleton from './components/PageSkeleton.vue'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -50,7 +51,7 @@ const openPopup = (name: typeof popupName.value) => {
 </script>
 
 <template>
-  <scroll-view scroll-y class="viewport">
+  <scroll-view v-if="goods" scroll-y class="viewport">
     <!-- 基本信息 -->
     <view class="goods">
       <!-- 商品主图 -->
@@ -144,6 +145,9 @@ const openPopup = (name: typeof popupName.value) => {
       </view>
     </view>
   </scroll-view>
+  <view v-else>
+    <PageSkeleton />
+  </view>
 
   <!-- 用户操作 -->
   <view
