@@ -58,7 +58,7 @@
       "style": {
         "navigationBarTitleText": "商品详情"
       }
-    },
+    }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
@@ -98,5 +98,31 @@
         "selectedIconPath": "static/tabs/user_selected.png"
       }
     ]
+  },
+  // 子包加载规则
+  "subPackages": [
+    {
+      // 子包的根目录
+      "root": "pagesMember",
+      // 页面路径和窗口表现
+      "pages": [
+        {
+          "path": "settings/settings",
+          "style": {
+            "navigationBarTitleText": "设置"
+          }
+        }
+      ]
+    }
+  ],
+  // 分包预下载时间
+  "preloadRule": {
+    // 进入我的 页面时，预下载分包
+    "pages/my/my": {
+      "network": "all", // [!code ++]
+      "packages": [
+        "pagesMember"
+      ] // [!code ++]
+    }
   }
 }
