@@ -14,6 +14,7 @@ import type { BannerItem, CategoryItem, HotItem } from '@/types/home'
 import type { XtxGuessInstance } from '@/types/component'
 import HotPanel from './components/HotPanel.vue'
 import PageSkeleton from './components/PageSkeleton.vue'
+import { useGuessList } from '@/composables'
 // 指定类型
 const bannerList = ref<BannerItem[]>([])
 const categoryList = ref<CategoryItem[]>([])
@@ -33,12 +34,8 @@ const getHomeHotData = async () => {
   const res = await getHomeHotAPI()
   HotList.value = res.result
 }
-// 滚动容器 滚动触底
-const guessRef = ref<XtxGuessInstance>()
-const onScrolltolower = () => {
-  // 父调子
-  guessRef.value?.getMore()
-}
+// 猜你喜欢分页加载
+const { guessRef, onScrolltolower } = useGuessList()
 // 下拉刷新状态
 const isTriggered = ref(false)
 // 自定义下拉刷新被触发
@@ -46,11 +43,14 @@ const onRefresherrefresh = async () => {
   // 开启动画
   isTriggered.value = true
   // 重置数据 父调子
-  guessRef.value?.resetData() //加载数据
+  guessRef.value?.resetData()
+  //加载数据
   await Promise.all([
     getHomeBannerData(),
     getHomeCategoryData(),
     getHomeHotData(),
+    // 猜你喜欢组件数据加载
+    guessRef.value?.getMore(),
   ])
   // 关闭动画
   isTriggered.value = false
