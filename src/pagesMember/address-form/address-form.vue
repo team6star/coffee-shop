@@ -47,25 +47,57 @@ const onRegionChange: UniHelper.RegionPickerOnChange = (ev) => {
 const onSwitchChange: UniHelper.SwitchOnChange = (ev) => {
   form.value.isDefault = ev.detail.value ? 1 : 0
 }
-
+// 定义校验规则
+const rules = {
+  receiver: {
+    rules: [{ required: true, errorMessage: '请填写收货人姓名' }],
+  },
+  contact: {
+    rules: [
+      { required: true, errorMessage: '请填写联系方式' },
+      {
+        pattern: /^1[3~9]\d{9}$/,
+        errorMessage: '手机号码格式不正确',
+      },
+    ],
+  },
+  fullLocation: {
+    rules: [{ required: true, errorMessage: '请选择所在地区' }],
+  },
+  address: {
+    rules: [{ required: true, errorMessage: '请填写详细地址' }],
+  },
+}
+// 获取表单实例，用于调用表单方法
+const formRef = ref<UniHelper.UniFormsInstance>()
 // 提交表单
 const onSubmit = async () => {
-  if (query.id) {
-    await putMemberAddressAPI(query.id as string, form.value) //有id 修改地址
-  } else {
-    // 新建地址请求
-    await postMemberAddressAPI(form.value) //无id 新建地址
+  try {
+    // 表单校验
+    await formRef?.value?.validate?.()
+    // 校验通过后再发送请求
+    if (query.id) {
+      // 修改地址请求
+      await putMemberAddressAPI(query.id as string, form.value) //有id 修改地址
+    } else {
+      // 新建地址请求
+      await postMemberAddressAPI(form.value) //无id 新建地址
+    }
+    // 成功提示
+    uni.showToast({
+      title: query.id ? '修改成功' : '添加成功',
+      icon: 'success',
+    })
+    // 返回上一页
+    setTimeout(() => {
+      uni.navigateBack()
+    }, 1500)
+  } catch (error) {
+    uni.showToast({
+      title: '请填写完整信息',
+      icon: 'error',
+    })
   }
-
-  // 成功提示
-  uni.showToast({
-    title: query.id ? '修改成功' : '添加成功',
-    icon: 'success',
-  })
-  // 返回上一页
-  setTimeout(() => {
-    uni.navigateBack()
-  }, 1500)
 }
 
 // 根据id获取收货地址详情
@@ -85,25 +117,25 @@ onLoad(() => {
 
 <template>
   <view class="content">
-    <form>
+    <uni-forms :rules="rules" :model="form" ref="formRef">
       <!-- 表单内容 -->
-      <view class="form-item">
+      <uni-forms-item name="receiver" class="form-item">
         <text class="label">收货人</text>
         <input
           class="input"
           placeholder="请填写收货人姓名"
           v-model="form.receiver"
         />
-      </view>
-      <view class="form-item">
+      </uni-forms-item>
+      <uni-forms-item name="contact" class="form-item">
         <text class="label">手机号码</text>
         <input
           class="input"
           placeholder="请填写收货人手机号码"
           v-model="form.contact"
         />
-      </view>
-      <view class="form-item">
+      </uni-forms-item>
+      <uni-forms-item name="fullLocation" class="form-item">
         <text class="label">所在地区</text>
         <picker
           class="picker"
@@ -114,15 +146,15 @@ onLoad(() => {
           <view v-if="form.fullLocation">{{ form.fullLocation }}</view>
           <view v-else class="placeholder">请选择省/市/区(县)</view>
         </picker>
-      </view>
-      <view class="form-item">
+      </uni-forms-item>
+      <uni-forms-item name="address" class="form-item">
         <text class="label">详细地址</text>
         <input
           class="input"
           placeholder="街道、楼牌号等信息"
           v-model="form.address"
         />
-      </view>
+      </uni-forms-item>
       <view class="form-item">
         <label class="label">设为默认地址</label>
         <switch
@@ -132,7 +164,7 @@ onLoad(() => {
           @change="onSwitchChange"
         />
       </view>
-    </form>
+    </uni-forms>
   </view>
   <!-- 提交按钮 -->
   <button class="button" @tap="onSubmit">保存并使用</button>
