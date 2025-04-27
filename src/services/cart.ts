@@ -20,3 +20,14 @@ export const getMemberCartAPI = () => {
     url: '/member/cart',
   })
 }
+/**
+ * 删除/清空购物车单品
+ * @params ids - 删除的购物车商品id列表 ids未skuid集合
+ */
+export const deleteMemberCartAPI = (data: { ids: string[] }) => {
+  return http({
+    method: 'DELETE',
+    url: '/member/cart',
+    data,
+  })
+}

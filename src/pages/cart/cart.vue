@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useGuessList } from '@/composables'
-import { getMemberCartAPI } from '@/services/cart'
+import { deleteMemberCartAPI, getMemberCartAPI } from '@/services/cart'
 import { useMemberStore } from '@/stores'
 import type { CartItem } from '@/types/cart'
 import { onShow } from '@dcloudio/uni-app'
@@ -17,6 +17,22 @@ const getMemberCartData = async () => {
   // console.log('getMemberCartData', res)
 
   cartList.value = res.result
+}
+// 删除购物车
+const onDeleteCart = (skuId: string) => {
+  // 显示模态弹窗
+  uni.showModal({
+    content: '是否删除该商品',
+    success: async (res) => {
+      // 如果点击了确定
+      if (res.confirm) {
+        // 删除
+        await deleteMemberCartAPI({ ids: [skuId] })
+        // 获取购物车数据
+        getMemberCartData()
+      }
+    },
+  })
 }
 // 初始化调用 页面显示时触发
 onShow(() => {
@@ -76,7 +92,12 @@ onShow(() => {
             <!-- 右侧删除按钮 -->
             <template #right>
               <view class="cart-swipe-right">
-                <button class="button delete-button">删除</button>
+                <button
+                  @tap="onDeleteCart(item.skuId)"
+                  class="button delete-button"
+                >
+                  删除
+                </button>
               </view>
             </template>
           </uni-swipe-action-item>
