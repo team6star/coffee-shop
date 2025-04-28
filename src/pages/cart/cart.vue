@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import type { InputNumberBoxEvent } from '@/components/vk-data-input-number-box/vk-data-input-number-box'
 import { useGuessList } from '@/composables'
-import { deleteMemberCartAPI, getMemberCartAPI } from '@/services/cart'
+import {
+  deleteMemberCartAPI,
+  getMemberCartAPI,
+  putMemberCartByIdAPI,
+  putMemberCartSelectedAPI,
+} from '@/services/cart'
 import { useMemberStore } from '@/stores'
 import type { CartItem } from '@/types/cart'
 import { onShow } from '@dcloudio/uni-app'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 // 猜你喜欢分页加载
 const { guessRef, onScrolltolower } = useGuessList()
@@ -33,6 +39,33 @@ const onDeleteCart = (skuId: string) => {
       }
     },
   })
+}
+// 修改商品数量
+const onChangeCount = (ev: InputNumberBoxEvent) => {
+  // console.log(ev)
+  putMemberCartByIdAPI(ev.index, { count: ev.value })
+}
+// 修改选中状态-单品修改
+const onChangeSelected = (item: CartItem) => {
+  // 前端数据更新-是否选中取反
+  item.selected = !item.selected
+  // 后端数据更新
+  putMemberCartByIdAPI(item.skuId, { selected: item.selected })
+}
+// 计算全选状态
+const isSelectedAll = computed(() => {
+  return cartList.value.length && cartList.value.every((item) => item.selected)
+})
+// 修改选中状态
+const onChangeSelectedAll = () => {
+  //全选状态取反
+  const _isSelectedAll = !isSelectedAll.value
+  // 前端数据更新
+  cartList.value.forEach((item) => {
+    item.selected = _isSelectedAll
+  })
+  // 后端数据更新
+  putMemberCartSelectedAPI({ selected: _isSelectedAll })
 }
 // 初始化调用 页面显示时触发
 onShow(() => {
@@ -65,7 +98,11 @@ onShow(() => {
             <!-- 商品信息 -->
             <view class="goods">
               <!-- 选中状态 -->
-              <text class="checkbox" :class="{ checked: item.selected }"></text>
+              <text
+                @tap="onChangeSelected(item)"
+                class="checkbox"
+                :class="{ checked: item.selected }"
+              ></text>
               <navigator
                 :url="`/pages/goods/goods?id=${item.id}`"
                 hover-class="none"
@@ -84,9 +121,13 @@ onShow(() => {
               </navigator>
               <!-- 商品数量 -->
               <view class="count">
-                <text class="text">-</text>
-                <input class="input" type="number" value="1" />
-                <text class="text">+</text>
+                <vk-data-input-number-box
+                  v-model="item.count"
+                  :min="1"
+                  :max="item.stock"
+                  :index="item.skuId"
+                  :onChange="onChangeCount"
+                />
               </view>
             </view>
             <!-- 右侧删除按钮 -->
@@ -117,7 +158,12 @@ onShow(() => {
       </view>
       <!-- 吸底工具栏 -->
       <view class="toolbar">
-        <text class="all" :class="{ checked: true }">全选</text>
+        <text
+          @tap="onChangeSelectedAll"
+          class="all"
+          :class="{ checked: isSelectedAll }"
+          >全选</text
+        >
         <text class="text">合计:</text>
         <text class="amount">100</text>
         <view class="button-grounp">
