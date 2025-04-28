@@ -243,8 +243,8 @@ const onAddCart = async (ev: SkuPopupEvent) => {
       </button>
       <navigator
         class="icons-button"
-        url="/pages/cart/cart"
-        open-type="switchTab"
+        url="/pages/cart/cart2"
+        open-type="navigate"
       >
         <text class="icon-cart"></text>购物车
       </navigator>

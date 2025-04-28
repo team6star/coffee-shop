@@ -37,7 +37,7 @@ export const deleteMemberCartAPI = (data: { ids: string[] }) => {
  * @params count - 商品数量
  * @params selected - 是否选中
  */
-export const putMemberCartByIdAPI = (
+export const putMemberCartBySkuIdAPI = (
   skuId: string,
   data: { count?: number; selected?: boolean }
 ) => {
