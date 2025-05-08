@@ -3,6 +3,7 @@ import {
   deleteMemberAddressByIdAPI,
   getMemberAddressAPI,
 } from '@/services/address'
+import { useAddressStore } from '@/stores/modules/address'
 import type { AddressItem } from '@/types/address'
 import { onShow } from '@dcloudio/uni-app'
 import { ref } from 'vue'
@@ -23,11 +24,21 @@ const onDeleteAddress = async (id: string) => {
       if (res.confirm) {
         // 删除
         await deleteMemberAddressByIdAPI(id)
-        // 刷新
+        // 刷新获取最新地址列表
         getMemberAddressData()
       }
     },
   })
+}
+
+// 修改收货地址 `<navigator>` 组件需要阻止事件冒泡。
+// 否则点击按钮时，会触发 `<navigator>` 组件的点击事件，导致页面跳转。
+const onChangeAddress = (item: AddressItem) => {
+  // 修改选中收货地址
+  const addressStore = useAddressStore()
+  addressStore.changeSelectedAddress(item)
+  // 返回上一页
+  uni.navigateBack()
 }
 // 初始化调用(页面显示)
 onShow(() => {
@@ -39,7 +50,7 @@ onShow(() => {
   <view class="viewport">
     <!-- 地址列表 -->
     <scroll-view class="scroll-view" scroll-y>
-      <view v-if="true" class="address">
+      <view v-if="addressList.length" class="address">
         <uni-swipe-action class="address-list">
           <!-- 收货地址项 -->
           <uni-swipe-action-item
@@ -48,7 +59,7 @@ onShow(() => {
             :key="item.id"
           >
             <!--  默认插槽 收货地址项内容 -->
-            <view class="item-content">
+            <view class="item-content" @tap="onChangeAddress(item)">
               <view class="user">
                 {{ item.receiver }}
                 <text class="contact">{{ item.contact }}</text>
@@ -61,6 +72,7 @@ onShow(() => {
                 class="edit"
                 hover-class="none"
                 :url="`/pagesMember/address-form/address-form?id=${item.id}`"
+                @tap.stop="() => {}"
               >
                 修改
               </navigator>

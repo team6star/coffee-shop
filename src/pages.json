@@ -140,6 +140,17 @@
         }
       ]
     },
+    {
+      "root": "pagesOrder",
+      "pages": [
+        {
+          "path": "create/create",
+          "style": {
+            "navigationBarTitleText": "填写订单页"
+          }
+        }
+      ]
+    }
   ],
   // 分包预下载时间
   "preloadRule": {
