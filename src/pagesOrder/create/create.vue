@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { getMemberOrderPreAPI } from '@/services/order'
+import {
+  getMemberOrderPreAPI,
+  getMemberOrderPreNowAPI,
+  postMemberOrderAPI,
+} from '@/services/order'
 import { useAddressStore } from '@/stores/modules/address'
 import type { OrderPreResult } from '@/types/order'
 import { onLoad } from '@dcloudio/uni-app'
@@ -23,11 +27,30 @@ const activeDelivery = computed(() => deliveryList.value[activeIndex.value])
 const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
   activeIndex.value = ev.detail.value
 }
+
+// 页面参数
+const query = defineProps<{
+  skuId?: string
+  count?: string
+}>()
+
 // 获取预付订单
 const orderPre = ref<OrderPreResult>()
 const getMemberOrderPreData = async () => {
-  const res = await getMemberOrderPreAPI()
-  orderPre.value = res.result
+  // 是否有立即购买参数
+  if (query.count && query.skuId) {
+    // 调用立即购买 API
+    const res = await getMemberOrderPreNowAPI({
+      skuId: query.skuId,
+      count: query.count,
+    })
+    orderPre.value = res.result
+  } else {
+    // 调用预付订单 API
+    const res = await getMemberOrderPreAPI()
+    orderPre.value = res.result
+  }
+
   // console.log(res)
 }
 // 初始化调用
@@ -43,6 +66,33 @@ const selectedAddress = computed(() => {
     orderPre.value?.userAddresses.find((item) => item.isDefault)
   )
 })
+
+// 提交订单
+const onOrderSubmit = async () => {
+  // 没有收货地址体现
+  if (!selectedAddress.value?.id) {
+    return uni.showToast({
+      title: '请选择收货地址',
+      icon: 'none',
+    })
+  }
+  // 发送请求
+  const res = await postMemberOrderAPI({
+    addressId: selectedAddress.value?.id,
+    buyerMessage: buyerMessage.value,
+    goods: orderPre.value!.goods.map((item) => ({
+      count: item.count,
+      skuId: item.skuId,
+    })),
+    payType: 1,
+    payChannel: 2,
+    deliveryTimeType: activeDelivery.value.type,
+  })
+  // 关闭当前页面，跳转到订单详情，传递订单id
+  uni.redirectTo({
+    url: `/pagesOrder/detail/detail?id=${res.result.id}`,
+  })
+}
 </script>
 
 <template>
@@ -138,7 +188,13 @@ const selectedAddress = computed(() => {
     <view class="total-pay symbol">
       <text class="number">{{ orderPre?.summary.totalPayPrice }}</text>
     </view>
-    <view class="button" :class="{ disabled: true }"> 提交订单 </view>
+    <view
+      @tap="onOrderSubmit"
+      class="button"
+      :class="{ disabled: !selectedAddress?.id }"
+    >
+      提交订单
+    </view>
   </view>
 </template>
 

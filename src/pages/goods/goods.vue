@@ -114,6 +114,15 @@ const onAddCart = async (ev: SkuPopupEvent) => {
   // 关闭SKU弹窗
   isShowSku.value = false
 }
+// 立即购买事件
+const onBuyNow = (ev: SkuPopupEvent) => {
+  // 跳转页面并传参
+  uni.navigateTo({
+    url: `/pagesOrder/create/create?id=${ev._id}&count=${ev.buy_num}`,
+  })
+  // 关闭SKU弹窗
+  isShowSku.value = false
+}
 </script>
 
 <template>
@@ -131,6 +140,7 @@ const onAddCart = async (ev: SkuPopupEvent) => {
       backgroundColor: '#E9F8F5',
     }"
     @add-cart="onAddCart"
+    @buy-now="onBuyNow"
   />
   <scroll-view v-if="goods" scroll-y class="viewport">
     <!-- 基本信息 -->
