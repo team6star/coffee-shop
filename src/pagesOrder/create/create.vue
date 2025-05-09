@@ -48,6 +48,8 @@ const getMemberOrderPreData = async () => {
   } else {
     // 调用预付订单 API
     const res = await getMemberOrderPreAPI()
+    // console.log(res)
+
     orderPre.value = res.result
   }
 
@@ -127,7 +129,7 @@ const onOrderSubmit = async () => {
       <navigator
         v-for="item in orderPre?.goods"
         :key="item.skuId"
-        :url="`/pages/goods/goods?id=${item.skuId}`"
+        :url="`/pages/goods/goods?id=${item.id}`"
         class="item"
         hover-class="none"
       >

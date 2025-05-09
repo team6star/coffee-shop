@@ -82,12 +82,20 @@ onReady(() => {
 const order = ref<OrderResult>()
 const getMemberOrderByIdData = async () => {
   const res = await getMemberOrderByIdAPI(query.id)
+  console.log('订单详情', res)
+
   order.value = res.result
 }
 
 onLoad(() => {
   getMemberOrderByIdData()
 })
+
+// 倒计时时间到触发事件
+const onTimeup = () => {
+  // 支付超时修改订单状态为：已取消
+  order.value!.orderState = OrderState.YiQuXiao
+}
 </script>
 
 <template>
@@ -115,7 +123,7 @@ onLoad(() => {
     id="scroller"
     @scrolltolower="onScrolltolower"
   >
-    <template v-if="true">
+    <template v-if="order">
       <!-- 订单状态 -->
       <view
         class="overview"
@@ -127,7 +135,15 @@ onLoad(() => {
           <view class="tips">
             <text class="money">应付金额: ¥ 99.00</text>
             <text class="time">支付剩余</text>
-            00 时 29 分 59 秒
+            <!-- 倒计时 -->
+            <uni-countdown
+              :second="order.countdown"
+              color="#fff"
+              splitor-color="#fff"
+              :showDay="false"
+              :show-colon="false"
+              @timeup="onTimeup"
+            />
           </view>
           <view class="button">去支付</view>
         </template>

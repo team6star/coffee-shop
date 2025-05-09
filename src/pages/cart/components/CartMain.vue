@@ -109,11 +109,11 @@ const onPayment = () => {
       icon: 'none',
     })
   }
-  uni.showToast({ title: '等待完善' })
+  // uni.showToast({ title: '等待完善' })
   // 跳转到结算页面
-  /* uni.navigateTo({
+  uni.navigateTo({
     url: '/pagesOrder/create/create',
-  }) */
+  })
 }
 
 // 初始化调用 页面显示时触发
