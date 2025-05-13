@@ -2,6 +2,7 @@
 import {
   getMemberOrderPreAPI,
   getMemberOrderPreNowAPI,
+  getMemberOrderRepurchaseByIdAPI,
   postMemberOrderAPI,
 } from '@/services/order'
 import { useAddressStore } from '@/stores/modules/address'
@@ -32,6 +33,7 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
 const query = defineProps<{
   skuId?: string
   count?: string
+  orderId?: string
 }>()
 
 // 获取预付订单
@@ -44,6 +46,10 @@ const getMemberOrderPreData = async () => {
       skuId: query.skuId,
       count: query.count,
     })
+    orderPre.value = res.result
+  } else if (query.orderId) {
+    // 再次购买
+    const res = await getMemberOrderRepurchaseByIdAPI(query.orderId)
     orderPre.value = res.result
   } else {
     // 调用预付订单 API

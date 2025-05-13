@@ -64,7 +64,7 @@
       "style": {
         "navigationBarTitleText": "商品详情"
       }
-    }
+    },
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
@@ -159,11 +159,17 @@
         {
           "path": "payment/payment",
           "style": {
-            "navigationBarTitleText": "支付结果",
+            "navigationBarTitleText": "支付结果"
           }
-        }
+        },
+        {
+          "path": "list/list",
+          "style": {
+            "navigationBarTitleText": "订单列表"
+          }
+        },
       ]
-    },
+    }
   ],
   // 分包预下载时间
   "preloadRule": {
