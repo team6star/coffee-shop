@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useGuessList } from '@/composables'
-import { getMemberOrderByIdAPI } from '@/services/order'
+import {
+  getMemberOrderByIdAPI,
+  getMemberOrderConsignmentByIdAPI,
+  putMemberOrderReceiptByIdAPI,
+} from '@/services/order'
 import type { OrderResult } from '@/types/order'
 import { onLoad, onReady } from '@dcloudio/uni-app'
 import { ref } from 'vue'
@@ -83,7 +87,7 @@ onReady(() => {
 const order = ref<OrderResult>()
 const getMemberOrderByIdData = async () => {
   const res = await getMemberOrderByIdAPI(query.id)
-  console.log('订单详情', res)
+  // console.log('订单详情', res)
 
   order.value = res.result
 }
@@ -112,6 +116,42 @@ const onOrderPay = async () => {
   // 关闭当前页，再跳转支付结果页
   uni.navigateTo({
     url: `/pagesOrder/payment/payment?id=${query.id}`,
+  })
+}
+
+// 获取开发环境
+const isDev = import.meta.env.DEV
+// 点击模拟发货
+const onOrderSend = async () => {
+  // 仅在开发环境下使用，打包到生产环境时，请删除此代码
+  if (isDev) {
+    // 模拟发货
+    await getMemberOrderConsignmentByIdAPI(query.id)
+    uni.showToast({
+      title: '模拟发货成功',
+      icon: 'success',
+    })
+    // 手动修改订单状态为待发货
+    order.value!.orderState = OrderState.DaiShouHuo
+  }
+}
+
+// 确认收货
+const onOrderConfirm = async () => {
+  // 二次确认弹窗
+  uni.showModal({
+    content: '为保障您的权益，请收到货并确认无误后，再确认收货',
+    success: async (success) => {
+      if (success.confirm) {
+        const res = await putMemberOrderReceiptByIdAPI(query.id)
+        uni.showToast({
+          title: '确认收货成功',
+          icon: 'success',
+        })
+        // 更新订单状态
+        order.value = res.result
+      }
+    },
   })
 }
 </script>
@@ -180,7 +220,21 @@ const onOrderPay = async () => {
               再次购买
             </navigator>
             <!-- 待发货状态：模拟发货,开发期间使用,用于修改订单状态为已发货 -->
-            <view v-if="false" class="button"> 模拟发货 </view>
+            <view
+              v-if="isDev && order.orderState === OrderState.DaiFaHuo"
+              @tap="onOrderSend"
+              class="button"
+            >
+              模拟发货
+            </view>
+            <!-- 待收货状态: 展示确认收货 -->
+            <view
+              class="button primary"
+              v-if="order.orderState === OrderState.DaiShouHuo"
+              @tap="onOrderConfirm"
+            >
+              确认收货
+            </view>
           </view>
         </template>
       </view>
@@ -274,7 +328,7 @@ const onOrderPay = async () => {
         :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }"
       >
         <!-- 待付款状态:展示支付按钮 -->
-        <template v-if="true">
+        <template v-if="order.orderState === OrderState.DaiFuKuan">
           <view class="button primary" @tap="onOrderPay"> 去支付 </view>
           <view class="button" @tap="popup?.open?.()"> 取消订单 </view>
         </template>
@@ -288,7 +342,13 @@ const onOrderPay = async () => {
             再次购买
           </navigator>
           <!-- 待收货状态: 展示确认收货 -->
-          <view class="button primary"> 确认收货 </view>
+          <view
+            class="button primary"
+            v-if="order.orderState === OrderState.DaiShouHuo"
+            @tap="onOrderConfirm"
+          >
+            确认收货
+          </view>
           <!-- 待评价状态: 展示去评价 -->
           <view class="button"> 去评价 </view>
           <!-- 待评价/已完成/已取消 状态: 展示删除订单 -->
