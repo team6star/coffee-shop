@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { getMemberOrderAPI } from '@/services/order'
+import {
+  getMemberOrderAPI,
+  putMemberOrderReceiptByIdAPI,
+} from '@/services/order'
 import type { OrderItem, OrderListParams } from '@/types/order'
 import { orderStateList, OrderState } from '@/services/constants'
 import { onMounted, ref } from 'vue'
@@ -48,6 +51,24 @@ const onOrderPay = async (id: string) => {
   // 更新订单状态
   const order = orderList.value.find((item) => item.id === id)
   order!.orderState = OrderState.DaiFaHuo
+}
+
+// 确认收货
+const onOrderConfirm = (id: string) => {
+  // 二次确认弹窗
+  uni.showModal({
+    content: '为保障您的权益，请收到货并确认无误后，再确认收货',
+    success: async (success) => {
+      if (success.confirm) {
+        await putMemberOrderReceiptByIdAPI(id)
+        // 成功提示
+        uni.showToast({ title: '确认收货成功', icon: 'success' })
+        // 确认成功 更新为待评价
+        const order = orderList.value.find((item) => item.id === id)
+        order!.orderState = OrderState.DaiPingJia
+      }
+    },
+  })
 }
 </script>
 <template>
@@ -106,6 +127,7 @@ const onOrderPay = async (id: string) => {
           <view
             v-if="order.orderState === OrderState.DaiShouHuo"
             class="button primary"
+            @tap="onOrderConfirm(order.id)"
             >确认收货</view
           >
         </template>
