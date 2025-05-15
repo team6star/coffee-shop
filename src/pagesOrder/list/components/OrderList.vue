@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  deleteMemberOrderAPI,
   getMemberOrderAPI,
   putMemberOrderReceiptByIdAPI,
 } from '@/services/order'
@@ -70,6 +71,28 @@ const onOrderConfirm = (id: string) => {
     },
   })
 }
+
+// 删除订单
+const onOrderDelete = (id: string) => {
+  // 二次确认弹窗
+  uni.showModal({
+    content: '确定删除该订单吗？',
+    success: async (success) => {
+      if (success.confirm) {
+        // 删除订单
+        await deleteMemberOrderAPI({ ids: [id] })
+        // 删除成功 提示
+        uni.showToast({ title: '删除成功', icon: 'success' })
+        // 删除成功 刷新列表
+        // getMemberOrderData()
+        // 删除成功 从列表中删除
+        // orderList.value = orderList.value.filter((item) => item.id !== id)
+        const index = orderList.value.findIndex((v) => v.id === id)
+        orderList.value.splice(index, 1)
+      }
+    },
+  })
+}
 </script>
 <template>
   <scroll-view scroll-y class="orders">
@@ -83,6 +106,7 @@ const onOrderConfirm = (id: string) => {
         <text
           v-if="order.orderState >= OrderState.DaiPingJia"
           class="icon-delete"
+          @tap="onOrderDelete(order.id)"
         ></text>
       </view>
       <!-- 商品信息，点击商品跳转到订单详情，不是商品详情 -->
