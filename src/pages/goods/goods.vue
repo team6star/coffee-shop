@@ -248,9 +248,11 @@ const onBuyNow = (ev: SkuPopupEvent) => {
   >
     <view class="icons">
       <button class="icons-button"><text class="icon-heart"></text>收藏</button>
+      <!-- #ifdef MP-WEIXIN -->
       <button class="icons-button" open-type="contact">
         <text class="icon-handset"></text>客服
       </button>
+
       <navigator
         class="icons-button"
         url="/pages/cart/cart2"
@@ -258,6 +260,7 @@ const onBuyNow = (ev: SkuPopupEvent) => {
       >
         <text class="icon-cart"></text>购物车
       </navigator>
+      <!-- #endif -->
     </view>
     <view class="buttons">
       <!-- 显示一个按钮 -->

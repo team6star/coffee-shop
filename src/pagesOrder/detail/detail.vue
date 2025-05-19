@@ -129,9 +129,11 @@ const onOrderPay = async () => {
     // 开发环境：模拟支付，修改订单状态为已支付
     await getPayMockAPI({ orderId: query.id })
   } else {
+    // #ifdef MP-WEIXIN
     // 生产环境：获取支付参数+发起微信支付
     const res = await getPayWxPayMiniPayAPI({ orderId: query.id })
     await wx.requestPayment(res.result)
+    // #endif
   }
   // 关闭当前页，再跳转支付结果页
   uni.navigateTo({
@@ -212,6 +214,7 @@ const onOrderCancel = async () => {
   <!-- 自定义导航栏: 默认透明不可见, scroll-view 滚动到 50 时展示 -->
   <view class="navbar" :style="{ paddingTop: safeAreaInsets?.top + 'px' }">
     <view class="wrap">
+      <!-- #ifdef MP-WEIXIN -->
       <navigator
         v-if="pages.length > 1"
         open-type="navigateBack"
@@ -224,6 +227,7 @@ const onOrderCancel = async () => {
         class="back icon-home"
       >
       </navigator>
+      <!-- #endif -->
       <view class="title">订单详情</view>
     </view>
   </view>

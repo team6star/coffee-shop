@@ -16,6 +16,7 @@ const { guessRef, onScrolltolower } = useGuessList()
     <view class="overview">
       <view class="status icon-checked">支付成功</view>
       <view class="buttons">
+        <!-- #ifdef MP-WEIXIN -->
         <navigator
           hover-class="none"
           class="button navigator"
@@ -32,6 +33,7 @@ const { guessRef, onScrolltolower } = useGuessList()
         >
           查看订单
         </navigator>
+        <!-- #endif -->
       </view>
     </view>
 

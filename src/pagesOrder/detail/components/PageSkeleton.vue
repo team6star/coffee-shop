@@ -2,10 +2,12 @@
   <view class="sk-container">
     <view class="navbar navbar" style="padding-top: 20px">
       <view class="wrap wrap">
+        <!-- #ifdef MP-WEIXIN -->
         <navigator
           class="back icon-home sk-pseudo sk-pseudo-circle"
           open-type="switchTab"
         ></navigator>
+        <!-- #endif -->
         <view class="title sk-transparent sk-text-14-2857-394 sk-text"
           >订单详情</view
         >
